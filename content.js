@@ -5,6 +5,8 @@
   window.__powerModeComboLoaded = true;
 
   const STORAGE_KEY = "powerModeSettings";
+  const typingRules = globalThis.PowerModeTypingRules;
+  if (!typingRules) return;
   const COMBO_TIMEOUT_MS = 1500;
   const FRAME_INTERVAL_MS = 1000 / 30;
   const MAX_PARTICLES = 150;
@@ -158,25 +160,15 @@
     }
   }
 
-  function isEditKey(event) {
-    if (event.defaultPrevented || event.isComposing || event.repeat) return false;
-    if (event.ctrlKey || event.metaKey || event.altKey) return false;
-    return event.key.length === 1 || ["Backspace", "Delete", "Enter"].includes(event.key);
-  }
-
   function onKeyDown(event) {
     const editor = isAllowedEditor(event.target);
     if (!editor) return;
     focusEditor(editor);
-    if (!isEditKey(event)) {
+    if (!typingRules.isEditKey(event)) {
       pendingEdit = null;
       return;
     }
     pendingEdit = { editor, expiresAt: performance.now() + 1000 };
-  }
-
-  function isTextMutation(inputType) {
-    return /^(insertText|insertLineBreak|insertParagraph|delete|insertReplacementText)/.test(inputType || "");
   }
 
   function onInput(event) {
@@ -189,7 +181,7 @@
     const pending = pendingEdit;
     pendingEdit = null;
     if (!pending || pending.editor !== editor || performance.now() > pending.expiresAt) return;
-    if (!isTextMutation(event.inputType)) return;
+    if (!typingRules.isTextMutation(event.inputType)) return;
     recordValidEdit(editor);
   }
 

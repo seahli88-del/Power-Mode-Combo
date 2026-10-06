@@ -13,7 +13,7 @@
     {
       "matches": ["http://*/*", "https://*/*"],
       "css": ["styles.css"],
-      "js": ["content.js"],
+      "js": ["typing-rules.js", "content.js"],
       "run_at": "document_idle"
     }
   ]
